@@ -12,11 +12,13 @@ let stats = {
 
 document.getElementById("maxHR").addEventListener("input", (event) => {
   maxHR = parseFloat(event.target.value);
+  chrome.storage.sync.set({ maxHR: maxHR }, () => {});
   plotHeartRateZones();
 });
 
 document.getElementById("restingHR").addEventListener("input", (event) => {
   restingHR = parseFloat(event.target.value);
+  chrome.storage.sync.set({ restingHR: restingHR }, () => {});
   plotHeartRateZones();
 });
 
@@ -55,7 +57,9 @@ function plotRawHeartRate() {
     },
   ];
 
-  Plotly.newPlot("raw-heart-rate", data);
+  Plotly.newPlot("raw-heart-rate", data, {
+    margin: { t: 5, r: 5, l: 25, b: 30 },
+  });
 }
 
 function plotBoxPlot() {
@@ -68,10 +72,13 @@ function plotBoxPlot() {
       jitter: 0.3,
       pointpos: -1.8,
       type: "box",
+      name: "Distribution",
     },
   ];
 
-  Plotly.newPlot("boxplot", data);
+  Plotly.newPlot("boxplot", data, {
+    margin: { t: 5, r: 5, l: 50, b: 30 },
+  });
 }
 
 function plotHeartRateZones() {
@@ -105,18 +112,20 @@ function plotHeartRateZones() {
     const data = [
       {
         x: [
-          `<60% (<${Boundary60})`,
-          `60-70% (${Boundary60}-${Boundary70})`,
-          `70-80% (${Boundary70}-${Boundary80})`,
-          `80-90% (${Boundary80}-${Boundary90})`,
-          `>90% (>${Boundary90})`,
+          `<${Boundary60}`,
+          `${Boundary60}-${Boundary70}`,
+          `${Boundary70}-${Boundary80}`,
+          `${Boundary80}-${Boundary90}`,
+          `>${Boundary90}`,
         ],
         y: zoneCounter,
         type: "bar",
       },
     ];
 
-    Plotly.newPlot("heart-rate-zones", data);
+    Plotly.newPlot("heart-rate-zones", data, {
+      margin: { t: 5, r: 5, l: 25, b: 30 },
+    });
   }
 }
 
@@ -134,9 +143,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return { timestamp, value };
     });
 
-    calculateStats();
-    plotRawHeartRate();
-    plotBoxPlot();
-    plotHeartRateZones();
+    chrome.storage.sync.get(["maxHR", "restingHR"], (result) => {
+      if (result.maxHR) {
+        maxHR = result.maxHR;
+        document.getElementById("maxHR").value = maxHR;
+      }
+      if (result.restingHR) {
+        restingHR = result.restingHR;
+        document.getElementById("restingHR").value = restingHR;
+      }
+
+      calculateStats();
+      plotRawHeartRate();
+      plotBoxPlot();
+      plotHeartRateZones();
+    });
   }
 });
