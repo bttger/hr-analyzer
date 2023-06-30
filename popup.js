@@ -25,17 +25,17 @@ document.getElementById("restingHR").addEventListener("input", (event) => {
 });
 
 statisticsElem.calculateStats = function () {
-  const heartRates = this.data.heartRates;
-  heartRates.sort((a, b) => a - b);
-  const len = heartRates.length;
-  const q1 = heartRates[Math.floor(len / 4)];
-  const median = heartRates[Math.floor(len / 2)];
-  const q3 = heartRates[Math.floor((3 * len) / 4)];
-  const sum = heartRates.reduce((a, b) => a + b, 0);
+  const values = this.data.heartRates.map((hr) => hr.value);
+  values.sort((a, b) => a - b);
+  const len = values.length;
+  const q1 = values[Math.floor(len / 4)];
+  const median = values[Math.floor(len / 2)];
+  const q3 = values[Math.floor((3 * len) / 4)];
+  const sum = values.reduce((a, b) => a + b, 0);
   const average = sum / len;
   this.data.stats = {
-    maximum: Math.max(...heartRates),
-    minimum: Math.min(...heartRates),
+    maximum: Math.max(...values),
+    minimum: Math.min(...values),
     average: average.toFixed(2),
     median: median,
     q3: q3,
@@ -55,20 +55,25 @@ statisticsElem.updateStatisticsInDOM = function () {
 
 statisticsElem.plotRawHeartRate = function () {
   const heartRates = this.data.heartRates;
+  const timestamps = heartRates.map((hr) => hr.timestamp);
+  const values = heartRates.map((hr) => hr.value);
+
   const data = [
     {
-      y: heartRates,
+      x: timestamps,
+      y: values,
       type: "scatter",
+      mode: "lines",
     },
   ];
   Plotly.newPlot("raw-heart-rate", data);
 };
 
 statisticsElem.plotBoxPlot = function () {
-  const heartRates = this.data.heartRates;
+  const values = this.data.heartRates.map((hr) => hr.value);
   const data = [
     {
-      y: heartRates,
+      y: values,
       boxpoints: "all",
       jitter: 0.3,
       pointpos: -1.8,
@@ -80,7 +85,7 @@ statisticsElem.plotBoxPlot = function () {
 
 statisticsElem.plotHeartRateZones = function () {
   if (this.data.maxHR && this.data.restingHR) {
-    const heartRates = this.data.heartRates;
+    const heartRates = this.data.heartRates.map((hr) => hr.value);
     const maxHR = this.data.maxHR;
     const restingHR = this.data.restingHR;
     const zones = [0, 0, 0, 0, 0];
@@ -109,9 +114,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "displayData") {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(request.data, "text/xml");
-    const heartRates = Array.from(
-      xmlDoc.getElementsByTagName("HeartRateBpm")
-    ).map((elem) => Number(elem.getElementsByTagName("Value")[0].textContent));
+
+    const trackpoints = xmlDoc.getElementsByTagName("Trackpoint");
+    const heartRates = Array.from(trackpoints).map((trackpoint) => {
+      const timestamp = trackpoint.getElementsByTagName("Time")[0].textContent;
+      const value = Number(
+        trackpoint.getElementsByTagName("Value")[0].textContent
+      );
+      return { timestamp, value };
+    });
+
     statisticsElem.data.heartRates = heartRates;
     statisticsElem.calculateStats();
     statisticsElem.plotRawHeartRate();
