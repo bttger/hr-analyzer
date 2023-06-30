@@ -11,12 +11,12 @@ let stats = {
 };
 
 document.getElementById("maxHR").addEventListener("input", (event) => {
-  maxHR = event.target.value;
+  maxHR = parseFloat(event.target.value);
   plotHeartRateZones();
 });
 
 document.getElementById("restingHR").addEventListener("input", (event) => {
-  restingHR = event.target.value;
+  restingHR = parseFloat(event.target.value);
   plotHeartRateZones();
 });
 
