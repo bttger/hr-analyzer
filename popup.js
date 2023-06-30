@@ -77,21 +77,41 @@ function plotBoxPlot() {
 function plotHeartRateZones() {
   if (maxHR && restingHR) {
     const values = heartRates.map((hr) => hr.value);
-    const zones = [0, 0, 0, 0, 0];
+    const zoneCounter = [0, 0, 0, 0, 0];
 
+    // Calculate the heart rate zones with the Karvonen formula
+    // https://en.wikipedia.org/wiki/Heart_rate#Karvonen_method
+    // target heart rate = ((max HR − resting HR) × %Intensity) + resting HR
     values.forEach((value) => {
       const percentage = ((value - restingHR) / (maxHR - restingHR)) * 100;
-      if (percentage < 60) zones[0]++;
-      else if (percentage < 70) zones[1]++;
-      else if (percentage < 80) zones[2]++;
-      else if (percentage < 90) zones[3]++;
-      else zones[4]++;
+      if (percentage < 60) zoneCounter[0]++;
+      else if (percentage < 70) zoneCounter[1]++;
+      else if (percentage < 80) zoneCounter[2]++;
+      else if (percentage < 90) zoneCounter[3]++;
+      else zoneCounter[4]++;
     });
 
+    // Based on the zoneCounter, calculate the percentage of time spent in each zone
+    const total = zoneCounter.reduce((a, b) => a + b, 0);
+    zoneCounter.forEach((value, index) => {
+      zoneCounter[index] = ((value / total) * 100).toFixed(2);
+    });
+
+    // Print the heart rate zones (e.g. 60-70% (133-156))
+    const Boundary60 = Math.round(0.6 * (maxHR - restingHR) + restingHR);
+    const Boundary70 = Math.round(0.7 * (maxHR - restingHR) + restingHR);
+    const Boundary80 = Math.round(0.8 * (maxHR - restingHR) + restingHR);
+    const Boundary90 = Math.round(0.9 * (maxHR - restingHR) + restingHR);
     const data = [
       {
-        x: ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5"],
-        y: zones,
+        x: [
+          `<60% (<${Boundary60})`,
+          `60-70% (${Boundary60}-${Boundary70})`,
+          `70-80% (${Boundary70}-${Boundary80})`,
+          `80-90% (${Boundary80}-${Boundary90})`,
+          `>90% (>${Boundary90})`,
+        ],
+        y: zoneCounter,
         type: "bar",
       },
     ];
