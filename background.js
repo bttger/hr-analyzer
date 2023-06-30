@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendDataToPopup(result[storageKey]);
       } else {
         const tcxUrl = `https://www.strava.com/activities/${activityId}/export_tcx`;
-        fetch(tcxUrl)
+        fetch(tcxUrl, { redirect: "error" })
           .then((response) => {
             if (!response.ok) {
               throw new Error("Network response was not ok");
@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           })
           .catch((error) => {
             console.error(
-              `There has been a problem with the fetch operation: ${error}`
+              `Could not download TCX file for activity ${activityId}`
             );
           });
       }
