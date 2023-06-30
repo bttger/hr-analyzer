@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Heart Rate Analysis</title>
+    <script src="plotly.min.js"></script>
+    <script defer src="alpine.min.js"></script>
+  </head>
+  <body>
+    <div id="raw-heart-rate" style="width: 90%; display: inline-block"></div>
+    <div id="boxplot" style="width: 10%; display: inline-block"></div>
+    <div id="heart-rate-zones" style="width: 100%"></div>
+    <div id="statistics" x-data="data" x-init="init" style="width: 100%">
+      <label for="maxHR">Maximum HR:</label>
+      <input
+        type="number"
+        id="maxHR"
+        name="maxHR"
+        x-on:input="updateMaxHR($event.target.value)"
+      />
+      <label for="restingHR">Resting HR:</label>
+      <input
+        type="number"
+        id="restingHR"
+        name="restingHR"
+        x-on:input="updateRestingHR($event.target.value)"
+      />
+
+      <table>
+        <tr>
+          <th>Statistic</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>Maximum</td>
+          <td x-text="stats.maximum"></td>
+        </tr>
+        <tr>
+          <td>Minimum</td>
+          <td x-text="stats.minimum"></td>
+        </tr>
+        <tr>
+          <td>Average</td>
+          <td x-text="stats.average"></td>
+        </tr>
+        <tr>
+          <td>Median</td>
+          <td x-text="stats.median"></td>
+        </tr>
+        <tr>
+          <td>Q3</td>
+          <td x-text="stats.q3"></td>
+        </tr>
+        <tr>
+          <td>Q1</td>
+          <td x-text="stats.q1"></td>
+        </tr>
+      </table>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Strava Heart Rate Analyzer",
+  "version": "1.0",
+  "description": "Analyze your heart rate from Strava activities.",
+  "permissions": ["storage", "unlimitedStorage", "tabs"],
+
+  "host_permissions": ["https://www.strava.com/"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.strava.com/activities/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
