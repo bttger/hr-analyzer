@@ -1,4 +1,6 @@
-document.getElementById("statistics").data = {
+const statisticsElem = document.getElementById("statistics");
+
+statisticsElem.data = {
   maxHR: null,
   restingHR: null,
   heartRates: [180, 178, 145, 144, 136, 145, 146, 157],
@@ -12,17 +14,17 @@ document.getElementById("statistics").data = {
   },
 };
 
-document.getElementById("statistics").updateMaxHR = function (maxHR) {
-  this.data.maxHR = maxHR;
-  this.plotHeartRateZones();
-};
+document.getElementById("maxHR").addEventListener("input", (event) => {
+  statisticsElem.data.maxHR = event.target.value;
+  statisticsElem.plotHeartRateZones();
+});
 
-document.getElementById("statistics").updateRestingHR = function (restingHR) {
-  this.data.restingHR = restingHR;
-  this.plotHeartRateZones();
-};
+document.getElementById("restingHR").addEventListener("input", (event) => {
+  statisticsElem.data.restingHR = event.target.value;
+  statisticsElem.plotHeartRateZones();
+});
 
-document.getElementById("statistics").calculateStats = function () {
+statisticsElem.calculateStats = function () {
   const heartRates = this.data.heartRates;
   heartRates.sort((a, b) => a - b);
   const len = heartRates.length;
@@ -39,9 +41,19 @@ document.getElementById("statistics").calculateStats = function () {
     q3: q3,
     q1: q1,
   };
+  this.updateStatisticsInDOM();
 };
 
-document.getElementById("statistics").plotRawHeartRate = function () {
+statisticsElem.updateStatisticsInDOM = function () {
+  document.getElementById("maximum").innerText = this.data.stats.maximum;
+  document.getElementById("minimum").innerText = this.data.stats.minimum;
+  document.getElementById("average").innerText = this.data.stats.average;
+  document.getElementById("median").innerText = this.data.stats.median;
+  document.getElementById("q3").innerText = this.data.stats.q3;
+  document.getElementById("q1").innerText = this.data.stats.q1;
+};
+
+statisticsElem.plotRawHeartRate = function () {
   const heartRates = this.data.heartRates;
   const data = [
     {
@@ -52,7 +64,7 @@ document.getElementById("statistics").plotRawHeartRate = function () {
   Plotly.newPlot("raw-heart-rate", data);
 };
 
-document.getElementById("statistics").plotBoxPlot = function () {
+statisticsElem.plotBoxPlot = function () {
   const heartRates = this.data.heartRates;
   const data = [
     {
@@ -66,7 +78,7 @@ document.getElementById("statistics").plotBoxPlot = function () {
   Plotly.newPlot("boxplot", data);
 };
 
-document.getElementById("statistics").plotHeartRateZones = function () {
+statisticsElem.plotHeartRateZones = function () {
   if (this.data.maxHR && this.data.restingHR) {
     const heartRates = this.data.heartRates;
     const maxHR = this.data.maxHR;
@@ -100,8 +112,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const heartRates = Array.from(
       xmlDoc.getElementsByTagName("HeartRateBpm")
     ).map((elem) => Number(elem.getElementsByTagName("Value")[0].textContent));
-    document.getElementById("statistics").data.heartRates = heartRates;
-    const statisticsElem = document.getElementById("statistics");
+    statisticsElem.data.heartRates = heartRates;
     statisticsElem.calculateStats();
     statisticsElem.plotRawHeartRate();
     statisticsElem.plotBoxPlot();
