@@ -83,20 +83,26 @@ function plotBoxPlot() {
 
 function plotHeartRateZones() {
   if (maxHR && restingHR) {
-    const values = heartRates.map((hr) => hr.value);
     const zoneCounter = [0, 0, 0, 0, 0];
 
     // Calculate the heart rate zones with the Karvonen formula
     // https://en.wikipedia.org/wiki/Heart_rate#Karvonen_method
     // target heart rate = ((max HR − resting HR) × %Intensity) + resting HR
-    values.forEach((value) => {
+    for (let i = 0; i < heartRates.length - 1; i++) {
+      const value = heartRates[i].value;
       const percentage = ((value - restingHR) / (maxHR - restingHR)) * 100;
-      if (percentage < 60) zoneCounter[0]++;
-      else if (percentage < 70) zoneCounter[1]++;
-      else if (percentage < 80) zoneCounter[2]++;
-      else if (percentage < 90) zoneCounter[3]++;
-      else zoneCounter[4]++;
-    });
+
+      // Calculate the time difference between the current and the next timestamp
+      const currentTime = new Date(heartRates[i].timestamp).getTime();
+      const nextTime = new Date(heartRates[i + 1].timestamp).getTime();
+      const timeDiff = nextTime - currentTime;
+
+      if (percentage < 60) zoneCounter[0] += timeDiff;
+      else if (percentage < 70) zoneCounter[1] += timeDiff;
+      else if (percentage < 80) zoneCounter[2] += timeDiff;
+      else if (percentage < 90) zoneCounter[3] += timeDiff;
+      else zoneCounter[4] += timeDiff;
+    }
 
     // Based on the zoneCounter, calculate the percentage of time spent in each zone
     const total = zoneCounter.reduce((a, b) => a + b, 0);
@@ -104,7 +110,7 @@ function plotHeartRateZones() {
       zoneCounter[index] = ((value / total) * 100).toFixed(2);
     });
 
-    // Print the heart rate zones (e.g. 60-70% (133-156))
+    // Print the heart rate zones
     const Boundary60 = Math.round(0.6 * (maxHR - restingHR) + restingHR);
     const Boundary70 = Math.round(0.7 * (maxHR - restingHR) + restingHR);
     const Boundary80 = Math.round(0.8 * (maxHR - restingHR) + restingHR);
