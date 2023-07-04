@@ -9,6 +9,8 @@ let stats = {
   q3: null,
   q1: null,
 };
+let zonePercentages = [0, 0, 0, 0, 0];
+let zoneMinutes = [0, 0, 0, 0, 0];
 
 document.getElementById("maxHR").addEventListener("input", (event) => {
   maxHR = parseFloat(event.target.value);
@@ -42,6 +44,11 @@ function updateStatisticsInDOM() {
   document.getElementById("median").innerText = stats.median;
   document.getElementById("q3").innerText = stats.q3;
   document.getElementById("q1").innerText = stats.q1;
+  for (let i = 0; i < 5; i++) {
+    document.getElementById(`zone${i + 1}percent`).innerText =
+      zonePercentages[i];
+    document.getElementById(`zone${i + 1}minutes`).innerText = zoneMinutes[i];
+  }
 }
 
 function plotRawHeartRate() {
@@ -83,7 +90,7 @@ function plotBoxPlot() {
 
 function plotHeartRateZones() {
   if (maxHR && restingHR) {
-    const zoneCounter = [0, 0, 0, 0, 0];
+    const zoneMs = [0, 0, 0, 0, 0];
 
     // Calculate the heart rate zones with the Karvonen formula
     // https://en.wikipedia.org/wiki/Heart_rate#Karvonen_method
@@ -98,17 +105,18 @@ function plotHeartRateZones() {
       // time diff in milliseconds
       const timeDiff = nextTime - currentTime;
 
-      if (percentage < 60) zoneCounter[0] += timeDiff;
-      else if (percentage < 70) zoneCounter[1] += timeDiff;
-      else if (percentage < 80) zoneCounter[2] += timeDiff;
-      else if (percentage < 90) zoneCounter[3] += timeDiff;
-      else zoneCounter[4] += timeDiff;
+      if (percentage < 60) zoneMs[0] += timeDiff;
+      else if (percentage < 70) zoneMs[1] += timeDiff;
+      else if (percentage < 80) zoneMs[2] += timeDiff;
+      else if (percentage < 90) zoneMs[3] += timeDiff;
+      else zoneMs[4] += timeDiff;
     }
 
     // Based on the zoneCounter, calculate the time spent in each zone in minutes
-    const total = zoneCounter.reduce((a, b) => a + b, 0);
-    zoneCounter.forEach((value, index) => {
-      zoneCounter[index] = Math.round((value / 1000 / 60) * 100) / 100;
+    const total = zoneMs.reduce((a, b) => a + b, 0);
+    zoneMs.forEach((value, index) => {
+      zoneMinutes[index] = (value / 1000 / 60).toFixed(1);
+      zonePercentages[index] = ((value / total) * 100).toFixed(1);
     });
 
     // Print the heart rate zones
@@ -125,7 +133,7 @@ function plotHeartRateZones() {
           `${Boundary80}-${Boundary90}`,
           `>${Boundary90}`,
         ],
-        y: zoneCounter,
+        y: zonePercentages,
         type: "bar",
       },
     ];
@@ -160,10 +168,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         document.getElementById("restingHR").value = restingHR;
       }
 
-      calculateStats();
       plotRawHeartRate();
       plotBoxPlot();
       plotHeartRateZones();
+      calculateStats();
     });
   }
 });

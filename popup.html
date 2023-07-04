@@ -24,36 +24,73 @@
       <label for="restingHR">Resting HR:</label>
       <input type="number" id="restingHR" name="restingHR" />
 
-      <table>
-        <tr>
-          <th>Statistic</th>
-          <th>Value</th>
-        </tr>
-        <tr>
-          <td>Maximum</td>
-          <td id="maximum"></td>
-        </tr>
-        <tr>
-          <td>Minimum</td>
-          <td id="minimum"></td>
-        </tr>
-        <tr>
-          <td>Average</td>
-          <td id="average"></td>
-        </tr>
-        <tr>
-          <td>Median</td>
-          <td id="median"></td>
-        </tr>
-        <tr>
-          <td>Q3</td>
-          <td id="q3"></td>
-        </tr>
-        <tr>
-          <td>Q1</td>
-          <td id="q1"></td>
-        </tr>
-      </table>
+      <div style="display: flex">
+        <div style="flex: 1">
+          <table>
+            <tr>
+              <th>Statistic</th>
+              <th>Value</th>
+            </tr>
+            <tr>
+              <td>Maximum</td>
+              <td id="maximum"></td>
+            </tr>
+            <tr>
+              <td>Minimum</td>
+              <td id="minimum"></td>
+            </tr>
+            <tr>
+              <td>Average</td>
+              <td id="average"></td>
+            </tr>
+            <tr>
+              <td>Median</td>
+              <td id="median"></td>
+            </tr>
+            <tr>
+              <td>Q3</td>
+              <td id="q3"></td>
+            </tr>
+            <tr>
+              <td>Q1</td>
+              <td id="q1"></td>
+            </tr>
+          </table>
+        </div>
+        <div style="flex: 1">
+          <table>
+            <tr>
+              <th>Zone</th>
+              <th>Percent</th>
+              <th>Time in minutes</th>
+            </tr>
+            <tr>
+              <td>Zone 1</td>
+              <td id="zone1percent"></td>
+              <td id="zone1minutes"></td>
+            </tr>
+            <tr>
+              <td>Zone 2</td>
+              <td id="zone2percent"></td>
+              <td id="zone2minutes"></td>
+            </tr>
+            <tr>
+              <td>Zone 3</td>
+              <td id="zone3percent"></td>
+              <td id="zone3minutes"></td>
+            </tr>
+            <tr>
+              <td>Zone 4</td>
+              <td id="zone4percent"></td>
+              <td id="zone4minutes"></td>
+            </tr>
+            <tr>
+              <td>Zone 5</td>
+              <td id="zone5percent"></td>
+              <td id="zone5minutes"></td>
+            </tr>
+          </table>
+        </div>
     </div>
     <script src="popup.js"></script>
   </body>
