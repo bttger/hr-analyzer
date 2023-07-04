@@ -95,6 +95,7 @@ function plotHeartRateZones() {
       // Calculate the time difference between the current and the next timestamp
       const currentTime = new Date(heartRates[i].timestamp).getTime();
       const nextTime = new Date(heartRates[i + 1].timestamp).getTime();
+      // time diff in milliseconds
       const timeDiff = nextTime - currentTime;
 
       if (percentage < 60) zoneCounter[0] += timeDiff;
@@ -104,10 +105,10 @@ function plotHeartRateZones() {
       else zoneCounter[4] += timeDiff;
     }
 
-    // Based on the zoneCounter, calculate the percentage of time spent in each zone
+    // Based on the zoneCounter, calculate the time spent in each zone in minutes
     const total = zoneCounter.reduce((a, b) => a + b, 0);
     zoneCounter.forEach((value, index) => {
-      zoneCounter[index] = ((value / total) * 100).toFixed(2);
+      zoneCounter[index] = Math.round((value / 1000 / 60) * 100) / 100;
     });
 
     // Print the heart rate zones
