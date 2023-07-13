@@ -16,12 +16,14 @@ document.getElementById("maxHR").addEventListener("input", (event) => {
   maxHR = parseFloat(event.target.value);
   chrome.storage.sync.set({ maxHR: maxHR }, () => {});
   plotHeartRateZones();
+  updateStatisticsInDOM();
 });
 
 document.getElementById("restingHR").addEventListener("input", (event) => {
   restingHR = parseFloat(event.target.value);
   chrome.storage.sync.set({ restingHR: restingHR }, () => {});
   plotHeartRateZones();
+  updateStatisticsInDOM();
 });
 
 function calculateStats() {
